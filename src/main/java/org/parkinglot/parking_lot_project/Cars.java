@@ -1,5 +1,7 @@
 package org.parkinglot.parking_lot_project;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -9,6 +11,9 @@ import java.io.IOException;
 
 @WebServlet(name = "Cars", value = "/Cars")
 public class Cars extends HttpServlet {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
