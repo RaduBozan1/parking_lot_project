@@ -7,10 +7,12 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import org.parkinglot.parking_lot_project.common.CarDto;
 import org.parkinglot.parking_lot_project.entities.Car;
+import org.parkinglot.parking_lot_project.entities.User;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
 
 @Stateless
 public class CarsBean {
@@ -43,5 +45,18 @@ public class CarsBean {
             carDtos.add(dto);
         }
         return carDtos;
+    }
+    public void createCar(String licensePlate, String parkingSpot, Long userId) {
+        LOG.info("createCar");
+
+        Car car = new Car();
+        car.setLicensePlate(licensePlate);
+        car.setParkingSpot(parkingSpot);
+
+        User user = entityManager.find(User.class, userId);
+        user.getCars().add(car);
+        car.setOwner(user);
+
+        entityManager.persist(car);
     }
 }
