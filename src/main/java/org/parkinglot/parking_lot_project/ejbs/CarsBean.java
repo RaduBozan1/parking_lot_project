@@ -10,6 +10,7 @@ import org.parkinglot.parking_lot_project.entities.Car;
 import org.parkinglot.parking_lot_project.entities.User;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -58,5 +59,47 @@ public class CarsBean {
         car.setOwner(user);
 
         entityManager.persist(car);
+    }
+    public CarDto findById(Long carId) {
+        LOG.info("findById");
+        Car car = entityManager.find(Car.class, carId);
+        if (car == null) {
+            return null;
+        }
+        return new CarDto(
+                car.getId(),
+                car.getLicensePlate(),
+                car.getParkingSpot(),
+                car.getOwner().getUsername()
+        );
+    }
+
+    public void updateCar(Long carId, String licensePlate, String parkingSpot, Long userId) {
+        LOG.info("updateCar");
+        Car car = entityManager.find(Car.class, carId);
+        car.setLicensePlate(licensePlate);
+        car.setParkingSpot(parkingSpot);
+
+        // scoate mașina de la vechiul proprietar și o adaugă la cel nou
+        User oldUser = car.getOwner();
+        oldUser.getCars().remove(car);
+
+        User user = entityManager.find(User.class, userId);
+        user.getCars().add(car);
+        car.setOwner(user);
+    }
+
+    public void deleteCarsByIds(Collection<Long> carIds) {
+        LOG.info("deleteCarsByIds");
+        for (Long carId : carIds) {
+            Car car = entityManager.find(Car.class, carId);
+            if (car != null) {
+                User owner = car.getOwner();
+                if (owner != null) {
+                    owner.getCars().remove(car);
+                }
+                entityManager.remove(car);
+            }
+        }
     }
 }
